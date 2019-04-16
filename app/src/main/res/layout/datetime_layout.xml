@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="horizontal"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_marginStart="8dp">
+
+    <TextView
+        android:id="@+id/tvDay"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        style="@style/Base.TextAppearance.AppCompat.Medium"
+        android:padding="4dp"
+        android:text="dd"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        style="@style/Base.TextAppearance.AppCompat.Medium"
+        android:text="-"/>
+
+    <TextView
+        android:id="@+id/tvMonth"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        style="@style/Base.TextAppearance.AppCompat.Medium"
+        android:padding="4dp"
+        android:text="mm"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        style="@style/Base.TextAppearance.AppCompat.Medium"
+        android:text="-"/>
+
+    <TextView
+        android:id="@+id/tvYear"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        style="@style/Base.TextAppearance.AppCompat.Medium"
+        android:padding="4dp"
+        android:text="yyyy"/>
+</LinearLayout>

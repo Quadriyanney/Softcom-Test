@@ -5,6 +5,7 @@ import android.text.InputType
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.ImageView
+import android.widget.LinearLayout
 import android.widget.RadioGroup
 import android.widget.TextView
 import com.google.android.material.textfield.TextInputEditText
@@ -26,14 +27,14 @@ fun ViewGroup.addTextField(inflater: LayoutInflater,
     if (label.length < 20) {
         textInputLayout.hint = label
     } else {
-        addTextFieldHeader(inflater, label)
+        addFormFieldHeader(inflater, label)
     }
 
     addView(textInputLayout)
 }
 
-fun ViewGroup.addTextFieldHeader(inflater: LayoutInflater, label: String) {
-    val textView = inflater.inflate(R.layout.text_field_header, this, false) as TextView
+fun ViewGroup.addFormFieldHeader(inflater: LayoutInflater, label: String) {
+    val textView = inflater.inflate(R.layout.form_field_header, this, false) as TextView
     textView.text = label
     addView(textView)
 }
@@ -52,4 +53,10 @@ fun ViewGroup.addRadioGroup(inflater: LayoutInflater, title: String, tag: String
     radioGroup.tag = tag
     radioGroup.findViewById<TextView>(R.id.tvRadioGroupTitle).text = title
     addView(radioGroup)
+}
+
+fun ViewGroup.createNewDateTimeLayout(inflater: LayoutInflater, tag: String): LinearLayout {
+    val datetimeLayout = inflater.inflate(R.layout.datetime_layout, this, false) as LinearLayout
+    datetimeLayout.tag = tag
+    return datetimeLayout
 }

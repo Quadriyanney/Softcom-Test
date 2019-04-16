@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
+import androidx.viewpager.widget.ViewPager
 import com.google.gson.Gson
 import kotlinx.android.synthetic.main.activity_main.*
 import java.io.IOException
@@ -33,6 +34,18 @@ class MainActivity : AppCompatActivity() {
             val pageAdapter = PageAdapter(fragments, supportFragmentManager)
             viewPager.offscreenPageLimit = fragments.size
             viewPager.adapter = pageAdapter
+
+            viewPager.addOnPageChangeListener(object : ViewPager.OnPageChangeListener {
+                override fun onPageScrollStateChanged(state: Int) {
+                }
+
+                override fun onPageScrolled(position: Int, positionOffset: Float, positionOffsetPixels: Int) {
+                    updatePageUI()
+                }
+
+                override fun onPageSelected(position: Int) {
+                }
+            })
 
             fabNextPage.setOnClickListener {
                 pageAdapter.getItem(viewPager.currentItem++)
