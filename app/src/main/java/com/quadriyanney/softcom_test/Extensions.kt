@@ -1,8 +1,11 @@
 package com.quadriyanney.softcom_test
 
-import android.telephony.PhoneNumberFormattingTextWatcher
+import android.text.Editable
+import android.text.InputFilter
 import android.text.InputType
+import android.text.TextWatcher
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.LinearLayout
@@ -12,31 +15,64 @@ import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
 import com.squareup.picasso.Picasso
 
+
+
 fun ViewGroup.addTextField(inflater: LayoutInflater,
                            label: String, tag: String, inputType: Int = InputType.TYPE_CLASS_TEXT) {
-    val textInputLayout = inflater.inflate(R.layout.text_field_layout, this, false) as TextInputLayout
+    val linearLayout = inflater.inflate(R.layout.text_field_layout, this, false) as LinearLayout
+    val textInputLayout = linearLayout.findViewById<TextInputLayout>(R.id.textInput)
     val textInputEditText = textInputLayout.findViewById<TextInputEditText>(R.id.editText)
 
     textInputEditText.inputType = inputType
-    textInputEditText.tag = tag
+    linearLayout.tag = tag
 
     if (inputType == InputType.TYPE_CLASS_PHONE) {
-        textInputEditText.addTextChangedListener(PhoneNumberFormattingTextWatcher())
+        val filterArray = arrayOfNulls<InputFilter>(1)
+        filterArray[0] = InputFilter.LengthFilter(13)
+        textInputEditText.filters = filterArray
+        textInputEditText.addTextChangedListener(object : TextWatcher{
+            var lastInput = ""
+            override fun afterTextChanged(s: Editable?) {
+                val input = s.toString()
+
+                if (input.length == 4 || input.length == 8 && !lastInput.endsWith("-")) {
+                    textInputEditText.setText(textInputEditText.text.toString() + "-")
+                    textInputEditText.setSelection(textInputEditText.text.toString().length)
+                }
+//                if (input.length == 5 || input.length == 9 && lastInput.endsWith("-")) {
+//                    if (input.length == 5){
+//                        textInputEditText.setText(textInputEditText.text.toString().substring(0,4))
+//                        textInputEditText.setSelection(textInputEditText.text.toString().length)
+//                    }
+//
+//                    if (input.length == 9) {
+//                        textInputEditText.setText(textInputEditText.text.toString().substring(0,8))
+//                        textInputEditText.setSelection(textInputEditText.text.toString().length)
+//                    }
+//
+//                }
+
+                lastInput = textInputEditText.text.toString()
+            }
+
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
+            }
+
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+
+            }
+
+        })
     }
 
     if (label.length < 20) {
         textInputLayout.hint = label
     } else {
-        addFormFieldHeader(inflater, label)
+        linearLayout.findViewById<TextView>(R.id.textInputHeader).visibility = View.VISIBLE
+        linearLayout.findViewById<TextView>(R.id.textInputHeader).text = label
     }
 
-    addView(textInputLayout)
-}
-
-fun ViewGroup.addFormFieldHeader(inflater: LayoutInflater, label: String) {
-    val textView = inflater.inflate(R.layout.form_field_header, this, false) as TextView
-    textView.text = label
-    addView(textView)
+    addView(linearLayout)
 }
 
 fun ViewGroup.addImageView(inflater: LayoutInflater, imageUrl: String, tag: String) {
@@ -47,12 +83,13 @@ fun ViewGroup.addImageView(inflater: LayoutInflater, imageUrl: String, tag: Stri
     addView(imageView)
 }
 
-fun ViewGroup.addRadioGroup(inflater: LayoutInflater, title: String, tag: String) {
+fun ViewGroup.createRadioGroup(inflater: LayoutInflater, title: String, tag: String): RadioGroup {
     val radioGroup = inflater.inflate(R.layout.radio_group_layout, this, false) as RadioGroup
 
-    radioGroup.tag = tag
     radioGroup.findViewById<TextView>(R.id.tvRadioGroupTitle).text = title
-    addView(radioGroup)
+    radioGroup.tag = tag
+
+    return radioGroup
 }
 
 fun ViewGroup.createNewDateTimeLayout(inflater: LayoutInflater, tag: String): LinearLayout {

@@ -6,8 +6,12 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.LinearLayout
+import android.widget.RadioButton
+import android.widget.RadioGroup
 import android.widget.TextView
 import androidx.fragment.app.Fragment
+import com.google.android.material.textfield.TextInputEditText
+import com.google.android.material.textfield.TextInputLayout
 import kotlinx.android.synthetic.main.fragment_page.*
 import java.text.DecimalFormat
 
@@ -35,8 +39,8 @@ class PageFragment : Fragment(), DatePickerFragment.OnFragmentInteractionListene
         super.onViewCreated(view, savedInstanceState)
         tvPageTitle.text = page.label
 
-        for (section in page.sections) {
-            for (element in section.elements) {
+        page.sections.forEach { section ->
+            section.elements.forEach { element ->
                 if (element.type == EMBEDDED_PHOTO) {
                     pageLayout.addImageView(layoutInflater,element.file?:"", element.uniqueId)
                 }
@@ -50,13 +54,41 @@ class PageFragment : Fragment(), DatePickerFragment.OnFragmentInteractionListene
                 }
 
                 if (element.type == YES_NO) {
-                    pageLayout.addRadioGroup(layoutInflater,element.label?:"", element.uniqueId)
+                    val radioGroup = pageLayout.createRadioGroup(layoutInflater,element.label?:"", element.uniqueId)
+                    radioGroup.findViewById<RadioButton>(R.id.rbYes).isChecked = true
+
+                    radioGroup.setOnCheckedChangeListener { _, checkedId ->
+                        run {
+                            when (checkedId) {
+                                R.id.rbYes -> {
+                                    if (element.rules != null) {
+                                        for (rule in element.rules) {
+                                            for (target in rule.targets) {
+                                                pageLayout.findViewWithTag<LinearLayout>(target).visibility = View.VISIBLE
+                                            }
+                                        }
+                                    }
+                                }
+                                R.id.rbNo -> {
+                                    if (element.rules != null) {
+                                        for (rule in element.rules) {
+                                            for (target in rule.targets) {
+                                                pageLayout.findViewWithTag<LinearLayout>(target).visibility = View.GONE
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    pageLayout.addView(radioGroup)
                 }
 
                 if (element.type == DATE_TIME) {
-                    pageLayout.addFormFieldHeader(layoutInflater, element.label?:"")
-
                     val dateTimeLayout = pageLayout.createNewDateTimeLayout(layoutInflater, element.uniqueId)
+                    dateTimeLayout.findViewById<TextView>(R.id.tvDateTimeHeader).text = element.label?:""
+
                     dateTimeLayout.setOnClickListener {
                         val datePickerFragment = DatePickerFragment.newInstance(it.tag as String)
                         datePickerFragment.setTargetFragment(this, 0)
@@ -76,6 +108,66 @@ class PageFragment : Fragment(), DatePickerFragment.OnFragmentInteractionListene
         dateLayout.findViewById<TextView>(R.id.tvDay).text = decimalFormat.format(dayOfMonth)
         dateLayout.findViewById<TextView>(R.id.tvMonth).text = decimalFormat.format(month)
         dateLayout.findViewById<TextView>(R.id.tvYear).text = decimalFormat.format(year)
+    }
+
+    fun validateForm(): String {
+        val string = StringBuilder()
+        string.append(page.label)
+        string.append("\n")
+        page.sections.forEach { section ->
+            section.elements.forEach { element ->
+                if (element.type == TEXT || element.type == FORMATTED_NUMERIC) {
+                    val rootLayout = pageLayout.findViewWithTag<LinearLayout>(element.uniqueId)
+                    val inputLayout = rootLayout.findViewById<TextInputLayout>(R.id.textInput)
+                    val editText = inputLayout.findViewById<TextInputEditText>(R.id.editText)
+
+                    val value = editText.text.toString()
+
+                    when {
+                        value == "" && element.isMandatory!! -> {
+                            string.append("${element.label}: Not Filled (Mandatory)")
+                            string.append("\n\n")
+                        }
+                        value == "" && !element.isMandatory!! -> {}
+                        else -> {
+                            string.append("${element.label}: $value")
+                            string.append("\n\n")
+                        }
+                    }
+                }
+
+                if (element.type == DATE_TIME) {
+                    val dateTimeLayout = pageLayout.findViewWithTag<LinearLayout>(element.uniqueId)
+
+                    val day = dateTimeLayout.findViewById<TextView>(R.id.tvDay).text.toString()
+                    val month = dateTimeLayout.findViewById<TextView>(R.id.tvMonth).text.toString()
+                    val year = dateTimeLayout.findViewById<TextView>(R.id.tvYear).text.toString()
+
+                    if (day == "dd") {
+                        string.append("${element.label}: Not Set (Mandatory)")
+                        string.append("\n\n")
+                    } else {
+                        string.append("${element.label}: $day - $month - $year")
+                        string.append("\n\n")
+                    }
+                }
+
+                if (element.type == YES_NO) {
+                    val radioLayout = pageLayout.findViewWithTag<RadioGroup>(element.uniqueId)
+
+                    val checkedValue = if (radioLayout.checkedRadioButtonId == R.id.rbYes) {
+                        "Yes"
+                    } else {
+                        "No"
+                    }
+
+                    string.append("${element.label}: $checkedValue")
+                    string.append("\n\n")
+                }
+            }
+        }
+
+        return string.toString()
     }
 
     companion object {

@@ -1,12 +1,29 @@
 <?xml version="1.0" encoding="utf-8"?>
-<com.google.android.material.textfield.TextInputLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_margin="8dp"
-    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical"
+    android:layout_margin="8dp">
 
-    <com.google.android.material.textfield.TextInputEditText
-        android:id="@+id/editText"
+    <TextView
+        android:id="@+id/textInputHeader"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:visibility="gone"
+        tools:text="Please provide a name"/>
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/textInput"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
-</com.google.android.material.textfield.TextInputLayout>
+        android:layout_height="wrap_content"
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/editText"
+            android:ems="10"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+    </com.google.android.material.textfield.TextInputLayout>
+</LinearLayout>

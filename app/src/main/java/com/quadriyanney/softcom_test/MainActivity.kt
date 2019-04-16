@@ -3,6 +3,7 @@ package com.quadriyanney.softcom_test
 import android.annotation.SuppressLint
 import android.os.Bundle
 import android.view.View
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.viewpager.widget.ViewPager
@@ -13,6 +14,7 @@ import java.io.IOException
 class MainActivity : AppCompatActivity() {
 
     private lateinit var form: Form
+    private lateinit var pageAdapter: PageAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -31,7 +33,7 @@ class MainActivity : AppCompatActivity() {
                 fragments.add(PageFragment.newInstance(page))
             }
 
-            val pageAdapter = PageAdapter(fragments, supportFragmentManager)
+            pageAdapter = PageAdapter(fragments, supportFragmentManager)
             viewPager.offscreenPageLimit = fragments.size
             viewPager.adapter = pageAdapter
 
@@ -56,7 +58,25 @@ class MainActivity : AppCompatActivity() {
                 pageAdapter.getItem(viewPager.currentItem--)
                 updatePageUI()
             }
+
+            fabSubmit.setOnClickListener {
+                validateForm()
+            }
         }
+    }
+
+    private fun validateForm() {
+        val resultDialog = AlertDialog.Builder(this)
+        resultDialog.setTitle("Form Results")
+
+        var message = ""
+        pageAdapter.fragments.forEach {
+            val fragment = it as PageFragment
+            message += fragment.validateForm()
+        }
+
+        resultDialog.setMessage(message)
+        resultDialog.show()
     }
 
     @SuppressLint("RestrictedApi")
